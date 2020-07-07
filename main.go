@@ -53,6 +53,21 @@ type Search struct {
 	Results    Results
 }
 
+func (s *Search) IsLastPage() bool {
+	return s.NextPage >= s.TotalPages
+}
+
+func (s *Search) CurrentPage() int {
+	if s.NextPage == 1 {
+		return s.NextPage
+	}
+	return s.NextPage - 1
+}
+
+func (s *Search) PreviousPage() int {
+	return s.CurrentPage() - 1
+}
+
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	tpl.Execute(w, nil)
 }
@@ -105,6 +120,11 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	search.TotalPages = int(math.Ceil(float64(search.Results.TotalResults / pageSize)))
+
+	if ok := !search.IsLastPage(); ok {
+		search.NextPage++
+	}
+
 	err = tpl.Execute(w, search)
 	if err != nil {
 		log.Fatal(err)
