@@ -1,3 +1,3 @@
-module main.go
+module https://github.com/32B3/firstGoApp
 
 go 1.14

@@ -1,0 +1,1 @@
+web: bin/firstGoApp -apikey $NEWS_API_KEY
