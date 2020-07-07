@@ -12,7 +12,7 @@
         <header>
           <a class="logo" href="/">News Demo</a>
           <form action="/search" method="GET">
-            <input autofocus class="search-input" value=""
+            <input autofocus class="search-input" value="{{ .SearchKey }}" placeholder="Enter a news topic" type="search" name="q">
             placeholder="Enter a news topic" type="search" name="q">
           </form>
           <a href="https://github.com/32B3/firstGoApp" class="button
