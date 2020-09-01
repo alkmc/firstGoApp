@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"runtime"
 	"strconv"
 	"time"
 )
@@ -143,11 +142,6 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-}
-
-func versionHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, runtime.Version())
 }
 
 func main() {
@@ -170,6 +164,5 @@ func main() {
 
 	mux.HandleFunc("/search", searchHandler)
 	mux.HandleFunc("/", indexHandler)
-	mux.HandleFunc("/version", versionHandler)
 	http.ListenAndServe(":"+port, mux)
 }
