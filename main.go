@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"runtime"
 	"strconv"
 	"time"
 )
@@ -19,13 +20,13 @@ var (
 	apiKey *string
 )
 
-type Source struct {
+type source struct {
 	ID   interface{} `json:"id"`
 	Name string      `json:"name"`
 }
 
-type Article struct {
-	Source      Source    `json:"source"`
+type article struct {
+	Source      source    `json:"source"`
 	Author      string    `json:"author"`
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
@@ -35,36 +36,36 @@ type Article struct {
 	Content     string    `json:"content"`
 }
 
-func (a *Article) FormatPublishedDate() string {
+func (a *article) FormatPublishedDate() string {
 	year, month, day := a.PublishedAt.Date()
 	return fmt.Sprintf("%v %d, %d", month, day, year)
 }
 
-type Results struct {
+type results struct {
 	Status       string    `json:"status"`
 	TotalResults int       `json:"totalResults"`
-	Articles     []Article `json:"articles"`
+	Articles     []article `json:"articles"`
 }
 
-type Search struct {
+type search struct {
 	SearchKey  string
 	NextPage   int
 	TotalPages int
-	Results    Results
+	Results    results
 }
 
-func (s *Search) IsLastPage() bool {
+func (s *search) IsLastPage() bool {
 	return s.NextPage >= s.TotalPages
 }
 
-func (s *Search) CurrentPage() int {
+func (s *search) CurrentPage() int {
 	if s.NextPage == 1 {
 		return s.NextPage
 	}
 	return s.NextPage - 1
 }
 
-func (s *Search) PreviousPage() int {
+func (s *search) PreviousPage() int {
 	return s.CurrentPage() - 1
 }
 
@@ -72,7 +73,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	tpl.Execute(w, nil)
 }
 
-type NewsAPIError struct {
+type newsAPIError struct {
 	Status  string `json:"status"`
 	Code    string `json:"code"`
 	Message string `json:"message"`
@@ -93,7 +94,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		page = "1"
 	}
 
-	search := &Search{}
+	search := &search{}
 	search.SearchKey = searchKey
 
 	next, err := strconv.Atoi(page)
@@ -105,7 +106,8 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	search.NextPage = next
 	pageSize := 20
 
-	endpoint := fmt.Sprintf("https://newsapi.org/v2/everything?q=%s&pageSize=%d&page=%d&apiKey=%s&sortBy=publishedAt&language=en", url.QueryEscape(search.SearchKey), pageSize, search.NextPage, *apiKey)
+	endpoint := fmt.Sprintf("https://newsapi.org/v2/everything?q=%s&pageSize=%d&page=%d&apiKey=%s&sortBy=publishedAt&language=en",
+		url.QueryEscape(search.SearchKey), pageSize, search.NextPage, *apiKey)
 	resp, err := http.Get(endpoint)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -115,13 +117,14 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		newErr := &NewsAPIError{}
+		newErr := &newsAPIError{}
 		err := json.NewDecoder(resp.Body).Decode(newErr)
 		if err != nil {
 			http.Error(w, "Unexpected server error", http.StatusInternalServerError)
 			return
 		}
 		http.Error(w, newErr.Message, http.StatusInternalServerError)
+		return
 	}
 
 	err = json.NewDecoder(resp.Body).Decode(&search.Results)
@@ -141,6 +144,10 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
+}
+
+func versionHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(runtime.Version())
 }
 
 func main() {
@@ -163,5 +170,6 @@ func main() {
 
 	mux.HandleFunc("/search", searchHandler)
 	mux.HandleFunc("/", indexHandler)
+	mux.HandleFunc("/version", versionHandler)
 	http.ListenAndServe(":"+port, mux)
 }
