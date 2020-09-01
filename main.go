@@ -147,7 +147,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func versionHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(runtime.Version())
+	fmt.Fprintln(w, runtime.Version())
 }
 
 func main() {
