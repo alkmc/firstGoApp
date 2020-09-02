@@ -48,8 +48,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 
 	endpoint := fmt.Sprintf(URL, url.QueryEscape(search.SearchKey), pageSize, search.NextPage, *apiKey)
 
-	err = fetch(endpoint, &search.Results)
-	if err != nil {
+	if err := fetch(endpoint, &search.Results); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 

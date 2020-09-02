@@ -14,11 +14,11 @@ var (
 )
 
 func main() {
-	apiKey = flag.String("apikey", "", "Newsapi.org access key")
+	apiKey = flag.String("apiKey", "", "Newsapi.org access key")
 	flag.Parse()
 
 	if *apiKey == "" {
-		log.Fatal("apikey must be set")
+		log.Fatal("apiKey must be set")
 	}
 
 	port := os.Getenv("PORT")
