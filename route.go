@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"log"
 	"math"
 	"net/http"
@@ -30,34 +29,33 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		page = "1"
 	}
 
-	search := &searchNews{}
-	search.SearchKey = searchKey
+	s := &searchNews{}
+	s.SearchKey = searchKey
 
 	next, err := strconv.Atoi(page)
 	if err != nil {
 		http.Error(w, "Unexpected server error", http.StatusInternalServerError)
 		return
 	}
-
-	search.NextPage = next
+	s.NextPage = next
 
 	const (
 		URL      = "https://newsapi.org/v2/everything?q=%s&pageSize=%d&page=%d&apiKey=%s&sortBy=publishedAt&language=en"
 		pageSize = 20
 	)
 
-	endpoint := fmt.Sprintf(URL, url.QueryEscape(search.SearchKey), pageSize, search.NextPage, *apiKey)
+	endpoint := fmt.Sprintf(URL, url.QueryEscape(s.SearchKey), pageSize, s.NextPage, *apiKey)
 
-	if err := fetch(endpoint, &search.Results); err != nil {
+	if err := fetch(endpoint, &s.Results); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	search.TotalPages = int(math.Ceil(float64(search.Results.TotalResults / pageSize)))
+	s.TotalPages = totalPages(s.Results.TotalResults, pageSize)
 
-	if ok := !search.IsLastPage(); ok {
-		search.NextPage++
+	if ok := !s.IsLastPage(); ok {
+		s.NextPage++
 	}
-	if err := tpl.Execute(w, search); err != nil {
+	if err := tpl.Execute(w, s); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -65,7 +63,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 func fetch(endpoint string, v interface{}) error {
 	resp, err := http.Get(endpoint)
 	if resp != nil {
-		defer bClose(resp.Body)
+		defer resp.Body.Close()
 	}
 	if err != nil {
 		return errors.New("Could not fetch data")
@@ -89,17 +87,14 @@ func fetch(endpoint string, v interface{}) error {
 	return nil
 }
 
-func bClose(b io.ReadCloser) {
-	if err := b.Close(); err != nil {
-		const msgErr = "error closing response body: %s"
-		log.Printf(msgErr, err.Error())
-	}
-}
-
 func decErr(err error) error {
 	if err != nil {
 		log.Println(err.Error())
 		return errors.New("JSON decoding error")
 	}
 	return nil
+}
+
+func totalPages(total, pageSize int) int {
+	return int(math.Ceil(float64(total / pageSize)))
 }
