@@ -4,7 +4,7 @@ LABEL maintainer="Alex <32b3@protonmail.com>"
 
 WORKDIR /goapp
 
-COPY go.mod go.sum ./
+COPY go.mod ./
 
 RUN go mod download
 
