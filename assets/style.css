@@ -9,7 +9,7 @@ html {
   }
   
   :root {
-    --light-green: #00ff00;
+    --turquoise: #2ec1ac;
     --dark-green: #003b00;
     --dark-grey: #777;
     --light-grey: #dadce0;
@@ -40,7 +40,7 @@ html {
   a.button:hover {
     text-decoration: none;
     background-color: var(--dark-green);
-    color: var(--light-green);
+    color: var(--turquoise);
   }
   
   header {
@@ -52,7 +52,7 @@ html {
     right: 0;
     display: flex;
     justify-content: space-between;
-    background-color: var(--light-green);
+    background-color: var(--turquoise);
     padding: 5px 10px;
     align-items: center;
   }
@@ -71,7 +71,7 @@ html {
     border-radius: 4px;
     border-color: transparent;
     background-color: var(--dark-green);
-    color: var(--light-green);
+    color: var(--turquoise);
     font-size: 16px;
     line-height: 1.4;
     padding-left: 5px;
@@ -98,7 +98,7 @@ html {
     display: flex;
     align-items: flex-start;
     margin-bottom: 30px;
-    border: 1px solid var(--light-grey);
+    border: 1px solid var(--turquoise);
     padding: 15px;
     border-radius: 4px;
     justify-content: space-between;
