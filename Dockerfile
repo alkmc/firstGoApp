@@ -1,4 +1,4 @@
-FROM golang:1.15 as build
+FROM golang:1.15 as builder
 
 LABEL maintainer="Alex <32b3@protonmail.com>"
 
@@ -13,7 +13,7 @@ COPY . .
 RUN go build -o app
 
 FROM gcr.io/distroless/base-debian10
-COPY --from=build /goapp /
+COPY --from=builder /goapp /
 
 ENV PORT=8000
 
