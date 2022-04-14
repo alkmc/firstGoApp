@@ -45,7 +45,6 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	)
 
 	endpoint := fmt.Sprintf(URL, url.QueryEscape(s.SearchKey), pageSize, s.NextPage, *apiKey)
-
 	if err := fetch(endpoint, &s.Results); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -68,30 +67,23 @@ func fetch(endpoint string, v interface{}) error {
 	if err != nil {
 		return errors.New("could not fetch data")
 	}
+
 	dec := json.NewDecoder(resp.Body)
 
 	if resp.StatusCode != http.StatusOK {
-		newsErr := &newsAPIError{}
-		err := dec.Decode(newsErr)
-		if errs := decErr(err); errs != nil {
-			return errs
+		var newsErr newsAPIError
+		if err := dec.Decode(&newsErr); err != nil {
+			log.Println(err.Error())
+			return errors.New("json decoding error")
 		}
 		return errors.New(newsErr.Message)
 	}
 
-	err = dec.Decode(v)
-	if errs := decErr(err); errs != nil {
-		return errs
-	}
-
-	return nil
-}
-
-func decErr(err error) error {
-	if err != nil {
+	if err := dec.Decode(v); err != nil {
 		log.Println(err.Error())
 		return errors.New("json decoding error")
 	}
+
 	return nil
 }
 
