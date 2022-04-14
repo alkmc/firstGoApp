@@ -28,24 +28,24 @@ func main() {
 	mux.HandleFunc("/search", searchHandler)
 	mux.HandleFunc("/", indexHandler)
 
-	log.Printf("Starting http server on port %s\n", port)
+	log.Printf("starting http server on port: %s", port)
 	go func() {
 		if err := s.ListenAndServe(); err != http.ErrServerClosed {
-			log.Fatalf("Error starting server %s", err.Error())
+			log.Fatalf("error starting server: %v", err)
 		}
 	}()
-	log.Print("Server Started")
+	log.Print("server started")
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	<-done
-	log.Print("Signal closing server received")
+	log.Print("signal closing server received")
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
 	if err := s.Shutdown(ctx); err != nil {
-		log.Println("server shutdown failed", "error", err)
+		log.Printf("server shutdown failed: %v", err)
 	}
-	log.Println("server shutdown gracefully")
+	log.Print("server shutdown gracefully")
 }

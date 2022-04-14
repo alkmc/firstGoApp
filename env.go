@@ -18,19 +18,19 @@ const (
 	writeR  = 10 * time.Second  // max time to write response to the client
 	keepA   = 120 * time.Second // max time for connections using TCP Keep-Alive
 	timeout = 10 * time.Second  // max time to complete tasks before shutdown
+	port    = ":3000"
 )
 
 func getPort() string {
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = ":3000"
 		return port
 	}
 	return ":" + port
 }
 
 func checkAPIKey() {
-	apiKey = flag.String("apiKey", "", "Newsapi.org access key")
+	apiKey = flag.String("apiKey", "", "newsapi.org access key")
 	flag.Parse()
 
 	if *apiKey == "" {

@@ -18,7 +18,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 func searchHandler(w http.ResponseWriter, r *http.Request) {
 	u, err := url.Parse(r.URL.String())
 	if err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
@@ -34,7 +34,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 
 	next, err := strconv.Atoi(page)
 	if err != nil {
-		http.Error(w, "Unexpected server error", http.StatusInternalServerError)
+		http.Error(w, "unexpected server error", http.StatusInternalServerError)
 		return
 	}
 	s.NextPage = next
@@ -66,7 +66,7 @@ func fetch(endpoint string, v interface{}) error {
 		defer resp.Body.Close()
 	}
 	if err != nil {
-		return errors.New("Could not fetch data")
+		return errors.New("could not fetch data")
 	}
 	dec := json.NewDecoder(resp.Body)
 
@@ -90,7 +90,7 @@ func fetch(endpoint string, v interface{}) error {
 func decErr(err error) error {
 	if err != nil {
 		log.Println(err.Error())
-		return errors.New("JSON decoding error")
+		return errors.New("json decoding error")
 	}
 	return nil
 }
