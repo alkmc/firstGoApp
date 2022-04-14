@@ -1,4 +1,4 @@
-FROM golang:1.16 as builder
+FROM golang:1.18 as builder
 
 LABEL maintainer="Alex <32b3@protonmail.com>"
 

@@ -1,3 +1,3 @@
 module github.com/32B3/firstGoApp
 
-go 1.16
+go 1.18
