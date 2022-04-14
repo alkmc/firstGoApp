@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 )
 
@@ -34,7 +35,7 @@ func main() {
 			log.Fatalf("error starting server: %v", err)
 		}
 	}()
-	log.Print("server started")
+	log.Printf("server started with %s", runtime.Version())
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
