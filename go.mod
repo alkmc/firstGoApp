@@ -1,3 +1,3 @@
-module github.com/32B3/firstGoApp
+module github.com/alkmc/firstGoApp
 
 go 1.17
