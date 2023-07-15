@@ -1,6 +1,6 @@
 FROM golang:1.20 as builder
 
-LABEL maintainer="Alex <32b3@proton.me>"
+LABEL maintainer="Alex <github.com/alkmc>"
 
 WORKDIR /goapp
 
