@@ -1,6 +1,6 @@
-FROM golang:1.19 as builder
+FROM golang:1.20 as builder
 
-LABEL maintainer="Alex <32b3@protonmail.com>"
+LABEL maintainer="Alex <github.com/alkmc>"
 
 WORKDIR /goapp
 
@@ -10,9 +10,9 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o app
+RUN CGO_ENABLED=0 go build -o app
 
-FROM gcr.io/distroless/base-debian10
+FROM gcr.io/distroless/base-debian11
 COPY --from=builder /goapp /
 
 ENV PORT=8000
