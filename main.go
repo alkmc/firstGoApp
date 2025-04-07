@@ -30,6 +30,10 @@ func main() {
 	mux.HandleFunc("/", indexHandler)
 
 	log.Printf("starting http server on port: %s", port)
+
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+
 	go func() {
 		if err := s.ListenAndServe(); err != http.ErrServerClosed {
 			log.Fatalf("error starting server: %v", err)
@@ -37,15 +41,13 @@ func main() {
 	}()
 	log.Printf("server started with %s", runtime.Version())
 
-	done := make(chan os.Signal, 1)
-	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-
-	<-done
+	<-ctx.Done()
 	log.Print("signal closing server received")
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	if err := s.Shutdown(ctx); err != nil {
+	if err := s.Shutdown(shutdownCtx); err != nil {
 		log.Printf("server shutdown failed: %v", err)
 	}
 	log.Print("server shutdown gracefully")
