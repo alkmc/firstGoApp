@@ -6,8 +6,8 @@ import (
 )
 
 type source struct {
-	ID   interface{} `json:"id"`
-	Name string      `json:"name"`
+	ID   any    `json:"id"`
+	Name string `json:"name"`
 }
 
 type article struct {
